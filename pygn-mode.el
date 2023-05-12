@@ -2011,14 +2011,16 @@ The board display respects variations."
 
 When called non-interactively, display the board corresponding to POS."
   (interactive "d")
-  (let ((pgn (pygn-mode-pgn-at-pos-as-if-variation pos)))
+  (when-let ((pgn (pygn-mode-pgn-at-pos-as-if-variation pos))) ; Fails on nil
     ;; todo it might be a better design if a temp buffer wasn't needed here
     (with-temp-buffer
+      (insert " *")			; Seems termination marker is required
+      (beginning-of-buffer)		; Point must precede termination marker
       (insert pgn)
       ;; todo invoking the mode seems like it would be slow, compared to using
       ;; the parse we already have
       (pygn-mode)
-      (pygn-mode-display-board-at-pos (point-max)))))
+      (pygn-mode-display-board-at-pos (point)))))
 
 (defun pygn-mode-display-line-at-pos (pos)
   "Display the SAN line corresponding to the point in a separate buffer.
